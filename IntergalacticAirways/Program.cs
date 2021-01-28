@@ -36,17 +36,21 @@ namespace IntergalacticAirways
                 Console.Clear();
 
                 {
+                    var hasAnyCapableStarship = false;
+
                     while (pageIndex < appSettings.Value.MaximumPagination)
                     {
                         var index = pageIndex;
 
-                        var starships = await GetStartStarships(starshipService, index,
+                        var starships = await GetStarStarships(starshipService, index,
                             passengerCount, pilotService);
 
                         foreach (var starship in starships)
                         {
                             foreach (var pilot in starship.Pilots)
                             {
+                                hasAnyCapableStarship = true;
+
                                 Console.WriteLine($"{starship.Name} -- {pilot.Name}");
                             }
                         }
@@ -54,14 +58,29 @@ namespace IntergalacticAirways
                         pageIndex++;
                     }
 
+                    if (!hasAnyCapableStarship)
+                    {
+                        Console.WriteLine("No Starship capable to transport this number of passengers\n");
+
+                        PrintReturnKey();
+
+                        continue;
+                    }
+
                     Console.WriteLine();
-                    Console.Write("Press return key to begin again...");
-                    Console.Read();
+
+                    PrintReturnKey();
                 }
             }
         }
 
         #region Private methods
+
+        private static void PrintReturnKey()
+        {
+            Console.Write("Press return key to begin again...");
+            Console.Read();
+        }
 
         private static bool IsInputInvalid(string passengerReadLine)
         {
@@ -77,10 +96,10 @@ namespace IntergalacticAirways
 
             var numberPassengers = Convert.ToInt32(passengerReadLine);
 
-            return numberPassengers < 0;
+            return numberPassengers < 1;
         }
 
-        private static async Task<List<Starship>> GetStartStarships(IStarshipService starshipService, int pageIndex,
+        private static async Task<List<Starship>> GetStarStarships(IStarshipService starshipService, int pageIndex,
             string numberOfPassengers,
             IPilotService pilotService)
         {

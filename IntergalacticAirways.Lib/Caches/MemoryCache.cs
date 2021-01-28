@@ -6,13 +6,9 @@ namespace IntergalacticAirways.Lib.Caches
 {
     public class MemoryCache : IMemoryCache
     {
-
         private readonly Microsoft.Extensions.Caching.Memory.IMemoryCache _memoryCache;
 
-        public MemoryCache(Microsoft.Extensions.Caching.Memory.IMemoryCache memoryCache
-
-            
-            )
+        public MemoryCache(Microsoft.Extensions.Caching.Memory.IMemoryCache memoryCache)
         {
             _memoryCache = memoryCache;
         }
@@ -25,7 +21,7 @@ namespace IntergalacticAirways.Lib.Caches
                     cache =>
                     {
                         cache.SlidingExpiration = TimeSpan.FromMinutes(120);
-          
+
 
                         return Task.FromResult(data);
                     });
