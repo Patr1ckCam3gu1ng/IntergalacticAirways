@@ -3,11 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntergalacticAirways", "IntergalacticAirways.csproj", "{BF28BE78-5BBB-4D9D-851A-C4DD27FF5F89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntergalacticAirways", "IntergalacticAirways.csproj", "{BF28BE78-5BBB-4D9D-851A-C4DD27FF5F89}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntergalacticAirways.BLL", "..\IntergalacticAirways.BLL\IntergalacticAirways.BLL.csproj", "{8F5E43BE-075B-4F4E-8F86-87203034FCC2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntergalacticAirways.BLL", "..\IntergalacticAirways.BLL\IntergalacticAirways.BLL.csproj", "{8F5E43BE-075B-4F4E-8F86-87203034FCC2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntergalacticAirways.DAL", "..\IntergalacticAirways.DAL\IntergalacticAirways.DAL.csproj", "{F82ADFA9-087F-40A8-9CA8-576EC84C10C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntergalacticAirways.Infrastructure", "..\IntergalacticAirways.Infrastructure\IntergalacticAirways.Infrastructure.csproj", "{DB3B3879-858A-441D-A634-47EC026C0C6C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntergalacticAirways.DAL", "..\IntergalacticAirways.DAL\IntergalacticAirways.DAL.csproj", "{D45B8429-FFD4-4F87-B218-06D17072BF29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntergalacticAirways.Lib", "..\IntergalacticAirways.Lib\IntergalacticAirways.Lib.csproj", "{338B5056-BD49-488E-B152-DAEFCF24B1D1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +27,18 @@ Global
 		{8F5E43BE-075B-4F4E-8F86-87203034FCC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F5E43BE-075B-4F4E-8F86-87203034FCC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F5E43BE-075B-4F4E-8F86-87203034FCC2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F82ADFA9-087F-40A8-9CA8-576EC84C10C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F82ADFA9-087F-40A8-9CA8-576EC84C10C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F82ADFA9-087F-40A8-9CA8-576EC84C10C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F82ADFA9-087F-40A8-9CA8-576EC84C10C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB3B3879-858A-441D-A634-47EC026C0C6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB3B3879-858A-441D-A634-47EC026C0C6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB3B3879-858A-441D-A634-47EC026C0C6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB3B3879-858A-441D-A634-47EC026C0C6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D45B8429-FFD4-4F87-B218-06D17072BF29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D45B8429-FFD4-4F87-B218-06D17072BF29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D45B8429-FFD4-4F87-B218-06D17072BF29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D45B8429-FFD4-4F87-B218-06D17072BF29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{338B5056-BD49-488E-B152-DAEFCF24B1D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{338B5056-BD49-488E-B152-DAEFCF24B1D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{338B5056-BD49-488E-B152-DAEFCF24B1D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{338B5056-BD49-488E-B152-DAEFCF24B1D1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
