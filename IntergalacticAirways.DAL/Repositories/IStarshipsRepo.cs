@@ -6,6 +6,6 @@ namespace IntergalacticAirways.DAL.Repositories
 {
     public interface IStarshipsRepo
     {
-        Task<List<Starship>> GetAll(int pageIndex);
+        Task<List<Starship>> GetByPageIndexAsync(int pageIndex);
     }
 }

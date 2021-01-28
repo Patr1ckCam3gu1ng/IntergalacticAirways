@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using IntergalacticAirways.DAL.Models;
-using IntergalacticAirways.Lib.Cache.Services;
+using IntergalacticAirways.Lib.Caches;
+using IntergalacticAirways.Lib.HttpClients;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -16,17 +15,20 @@ namespace IntergalacticAirways.DAL.Repositories
     public class StarshipsRepo : IStarshipsRepo
     {
         private readonly AppSettings _appSettings;
-        private readonly IMemoryCacheService _cacheService;
+        private readonly IMemoryCache _cacheService;
+        private readonly IApiHttpClient _httpClient;
         private readonly IMapper _mapper;
 
-        public StarshipsRepo(IOptions<AppSettings> appSettings, IMemoryCacheService cacheService, IMapper mapper)
+        public StarshipsRepo(IMemoryCache cacheService, IApiHttpClient httpClient, IOptions<AppSettings> appSettings,
+            IMapper mapper)
         {
             _cacheService = cacheService;
+            _httpClient = httpClient;
             _mapper = mapper;
             _appSettings = appSettings.Value;
         }
 
-        public async Task<List<Starship>> GetAll(int pageIndex)
+        public async Task<List<Starship>> GetByPageIndexAsync(int pageIndex)
         {
             var cacheKey = $"{Resource.Starships}/?page={pageIndex}".ToLowerInvariant();
 
@@ -41,12 +43,14 @@ namespace IntergalacticAirways.DAL.Repositories
 
             var starShips = await RequestData(cacheKey);
 
-            if (starShips != null)
+            if (starShips == null)
             {
-                if (starShips.Any())
-                {
-                    starships.AddRange(starShips);
-                }
+                return starships;
+            }
+
+            if (starShips.Any())
+            {
+                starships.AddRange(starShips);
             }
 
             return starships;
@@ -54,32 +58,23 @@ namespace IntergalacticAirways.DAL.Repositories
 
         private async Task<List<Starship>> RequestData(string cacheKey)
         {
-            var apiEndpoint = $"{_appSettings.BaseUrl}{cacheKey}".ToLowerInvariant();
-
-            using var client = new HttpClient();
-
-            client.DefaultRequestHeaders
-                .Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
             var maxWaitToken =
                 new CancellationTokenSource(TimeSpan.FromSeconds(_appSettings.RequestMaximumWaitSeconds));
 
-            var response = await client.GetAsync(apiEndpoint, maxWaitToken.Token);
+            var jsonResponse = await _httpClient.SendGetRequest($"{_appSettings.BaseUrl}{cacheKey}", maxWaitToken.Token);
 
-            if (response.IsSuccessStatusCode)
+            if (jsonResponse == null)
             {
-                var jsonString = await response.Content.ReadAsStringAsync(maxWaitToken.Token);
-
-                var starShips = JsonConvert.DeserializeObject<StarshipResponse>(jsonString);
-
-                var mappedResults = _mapper.Map<List<Starship>>(starShips.Results);
-
-                await _cacheService.CacheResponseAsync(cacheKey, mappedResults);
-
-                return mappedResults;
+                return null;
             }
 
-            return null;
+            var starShips = JsonConvert.DeserializeObject<StarshipResponse>(jsonResponse);
+
+            var mappedResults = _mapper.Map<List<Starship>>(starShips.Results);
+
+            await _cacheService.CacheResponseAsync(cacheKey, mappedResults);
+
+            return mappedResults;
         }
     }
 }

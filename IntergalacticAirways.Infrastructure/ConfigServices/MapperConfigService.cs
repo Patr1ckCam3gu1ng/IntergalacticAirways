@@ -11,6 +11,8 @@ namespace IntergalacticAirways.Infrastructure.ConfigServices
         public MapperProfile()
         {
             CreateMap<StarshipDetail, Starship>()
+                .ForMember(c => c.Pilots, f =>
+                    f.MapFrom(c => c.Pilots.Select(url => new PilotDetail { Url = url })))
                 .ForMember(dest => dest.PassengerCapacity,
                     opt =>
                         opt.MapFrom(src =>

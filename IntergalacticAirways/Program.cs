@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using IntergalacticAirways.BLL.Services;
 using IntergalacticAirways.DAL.Models;
@@ -15,40 +16,84 @@ namespace IntergalacticAirways
             var serviceProvider = HostBuilder.GetServiceProvider(args);
 
             var starshipService = serviceProvider.GetRequiredService<IStarshipService>();
-
+            var pilotService = serviceProvider.GetRequiredService<IPilotService>();
             var appSettings = serviceProvider.GetRequiredService<IOptions<AppSettings>>();
 
             while (true)
             {
-                Console.WriteLine("Enter number of passengers:");
-
-                var numberOfPassengers = Console.ReadLine();
-
-                if (string.IsNullOrWhiteSpace(numberOfPassengers) || string.IsNullOrEmpty(numberOfPassengers))
-                {
-                    continue;
-                }
-
-                if (!int.TryParse(numberOfPassengers, out _))
-                {
-                    continue;
-                }
-
                 var pageIndex = 1;
 
                 Console.Clear();
+                Console.Write("Enter number of passengers: ");
 
-                while (pageIndex <= appSettings.Value.MaximumPagination)
+                var passengerCount = Console.ReadLine();
+
+                if (IsInputInvalid(passengerCount))
                 {
-                    var starships = await starshipService.GetAllWithinCapacity(Convert.ToInt32(numberOfPassengers), pageIndex);
-
-                    pageIndex++;
-
-                    Parallel.ForEach(starships, starship => { Console.WriteLine($"{starship.Name} -- "); });
+                    continue;
                 }
 
-                break;
+                Console.Clear();
+
+                {
+                    while (pageIndex < appSettings.Value.MaximumPagination)
+                    {
+                        var index = pageIndex;
+
+                        var starships = await GetStartStarships(starshipService, index,
+                            passengerCount, pilotService);
+
+                        foreach (var starship in starships)
+                        {
+                            foreach (var pilot in starship.Pilots)
+                            {
+                                Console.WriteLine($"{starship.Name} -- {pilot.Name}");
+                            }
+                        }
+
+                        pageIndex++;
+                    }
+
+                    Console.WriteLine();
+                    Console.Write("Press return key to begin again...");
+                    Console.Read();
+                }
             }
         }
+
+        #region Private methods
+
+        private static bool IsInputInvalid(string passengerReadLine)
+        {
+            if (string.IsNullOrWhiteSpace(passengerReadLine) || string.IsNullOrEmpty(passengerReadLine))
+            {
+                return true;
+            }
+
+            if (!int.TryParse(passengerReadLine, out _))
+            {
+                return true;
+            }
+
+            var numberPassengers = Convert.ToInt32(passengerReadLine);
+
+            return numberPassengers < 0;
+        }
+
+        private static async Task<List<Starship>> GetStartStarships(IStarshipService starshipService, int pageIndex,
+            string numberOfPassengers,
+            IPilotService pilotService)
+        {
+            var starshipByPageIndex = await starshipService.GetByPageIndexAsync(pageIndex);
+
+            var starshipsByCapacity =
+                starshipService.FilterByCapacity(starshipByPageIndex, Convert.ToInt32(numberOfPassengers));
+
+            var starshipWithPilotName = pilotService.AssignStarshipPilot(starshipsByCapacity);
+
+            return starshipWithPilotName;
+        }
+
+        #endregion
     }
 }

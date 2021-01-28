@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace IntergalacticAirways.Lib.Cache.Services
+namespace IntergalacticAirways.Lib.Caches
 {
-    public interface IMemoryCacheService
+    public interface IMemoryCache
     {
         Task<object> CacheResponseAsync(string cacheKey, object data);
 

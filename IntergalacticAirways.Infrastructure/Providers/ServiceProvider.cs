@@ -4,7 +4,8 @@ using IntergalacticAirways.BLL.Services;
 using IntergalacticAirways.DAL.Models;
 using IntergalacticAirways.DAL.Repositories;
 using IntergalacticAirways.Infrastructure.ConfigServices;
-using IntergalacticAirways.Lib.Cache.Services;
+using IntergalacticAirways.Lib.Caches;
+using IntergalacticAirways.Lib.HttpClients;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -33,9 +34,13 @@ namespace IntergalacticAirways.Infrastructure.Providers
 
             services.Configure<AppSettings>(configuration.GetSection("App"));
 
-            services.AddSingleton<IMemoryCacheService, MemoryCacheService>();
+            services.AddSingleton<IMemoryCache, MemoryCache>();
+            services.AddSingleton<IApiHttpClient, ApiHttpClient>();
+
             services.AddScoped<IStarshipsRepo, StarshipsRepo>();
             services.AddScoped<IStarshipService, StarshipService>();
+            services.AddScoped<IPilotService, PilotService>();
+            services.AddScoped<IPilotRepo, PilotRepo>();
 
             services.RegisterAutoMapper();
             services.AddMemoryCache();

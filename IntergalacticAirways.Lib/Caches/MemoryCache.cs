@@ -2,14 +2,14 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace IntergalacticAirways.Lib.Cache.Services
+namespace IntergalacticAirways.Lib.Caches
 {
-    public class MemoryCacheService : IMemoryCacheService
+    public class MemoryCache : IMemoryCache
     {
 
-        private readonly IMemoryCache _memoryCache;
+        private readonly Microsoft.Extensions.Caching.Memory.IMemoryCache _memoryCache;
 
-        public MemoryCacheService(IMemoryCache memoryCache
+        public MemoryCache(Microsoft.Extensions.Caching.Memory.IMemoryCache memoryCache
 
             
             )

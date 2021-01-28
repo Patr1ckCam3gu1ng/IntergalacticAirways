@@ -1,4 +1,4 @@
-﻿namespace IntergalacticAirways.Lib.Cache
+﻿namespace IntergalacticAirways.Lib.Caches
 {
     public class CachePrefixes
     {

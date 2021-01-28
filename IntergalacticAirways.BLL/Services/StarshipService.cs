@@ -15,12 +15,17 @@ namespace IntergalacticAirways.BLL.Services
             _starshipsRepo = starshipsRepo;
         }
 
-        public async Task<List<Starship>> GetAllWithinCapacity(int numberOfPassengers, int pageIndex)
+        public async Task<List<Starship>> GetByPageIndexAsync(int pageIndex)
         {
-            var starships = await _starshipsRepo.GetAll(pageIndex);
+            var starships = await _starshipsRepo.GetByPageIndexAsync(pageIndex);
 
-            return starships?.Where(starship => starship.PassengerCapacity != null)
-                .Where(starship => starship.PassengerCapacity >= numberOfPassengers &&
+            return starships;
+        }
+
+        public List<Starship> FilterByCapacity(IEnumerable<Starship> starships, int numberOfPassengers)
+        {
+            return starships.Where(starship => starship.PassengerCapacity != null)
+                .Where(starship => numberOfPassengers >= starship.PassengerCapacity &&
                                    numberOfPassengers <= starship.PassengerCapacity)
                 .ToList();
         }
