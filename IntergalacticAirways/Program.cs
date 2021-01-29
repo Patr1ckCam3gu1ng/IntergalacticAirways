@@ -77,7 +77,7 @@ namespace IntergalacticAirways
 
             var numberPassengers = Convert.ToInt32(passengerReadLine);
 
-            return numberPassengers < 0;
+            return numberPassengers < 1;
         }
 
         private static async Task<List<Starship>> GetStartStarships(IStarshipService starshipService, int pageIndex,
