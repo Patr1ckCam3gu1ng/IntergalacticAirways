@@ -22,13 +22,8 @@ namespace IntergalacticAirways.DAL.Repositories
             _appSettings = appSettings.Value;
         }
 
-        public async Task<PilotDetail> RequestPilotDetailByUrl(string pilotUrl)
+        public async Task<PilotDetail> SetPilotDetailByUrl(string pilotUrl)
         {
-            if (_cacheService.GetCachedByKey(pilotUrl) is PilotDetail starShipCaches)
-            {
-                return starShipCaches;
-            }
-
             var maxWaitToken =
                 new CancellationTokenSource(TimeSpan.FromSeconds(_appSettings.RequestMaximumWaitSeconds));
 

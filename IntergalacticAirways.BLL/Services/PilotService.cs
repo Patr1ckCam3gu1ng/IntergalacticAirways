@@ -22,12 +22,14 @@ namespace IntergalacticAirways.BLL.Services
 
         public List<Starship> AssignStarshipPilot(List<Starship> starships)
         {
-            RequestPilotsDetail(starships);
+            SetPilotDetailsCache(starships);
 
-            return AssignStarshipPilotName(starships);
+            return GetPilotDetailsFromCache(starships);
         }
 
-        private List<Starship> AssignStarshipPilotName(IEnumerable<Starship> starships)
+        #region Private Functions
+
+        private List<Starship> GetPilotDetailsFromCache(IEnumerable<Starship> starships)
         {
             var starshipList = new List<Starship>();
 
@@ -52,17 +54,22 @@ namespace IntergalacticAirways.BLL.Services
             return starshipList;
         }
 
-        private void RequestPilotsDetail(IEnumerable<Starship> starships)
+        private void SetPilotDetailsCache(IEnumerable<Starship> starships)
         {
+            var nonCachedPilots = GetNonCachedPilotByUrl(starships);
+
+            if (!nonCachedPilots.Any())
+            {
+                return;
+            }
+
             var taskList = new List<Task>();
 
-            foreach (var starship in starships.Where(c => c.Pilots.Any()))
-            {
-                taskList.AddRange(starship.Pilots.Select(pilot =>
-                    Task.Run(async () => { await _pilotRepo.RequestPilotDetailByUrl(pilot.Url); },
-                        new CancellationTokenSource(TimeSpan.FromSeconds(_appSettings.RequestMaximumWaitSeconds))
-                            .Token)));
-            }
+            taskList.AddRange(
+                nonCachedPilots.Select(pilotUrl =>
+                    Task.Run(async () => { await _pilotRepo.SetPilotDetailByUrl(pilotUrl); },
+                        new CancellationTokenSource(
+                            TimeSpan.FromSeconds(_appSettings.RequestMaximumWaitSeconds)).Token)));
 
             if (!taskList.Any())
             {
@@ -72,5 +79,18 @@ namespace IntergalacticAirways.BLL.Services
             Task.WaitAll(taskList.ToArray(),
                 new CancellationTokenSource(TimeSpan.FromSeconds(_appSettings.RequestMaximumWaitSeconds)).Token);
         }
+
+        private List<string> GetNonCachedPilotByUrl(IEnumerable<Starship> starships)
+        {
+            var nonCachedPilot = from starship in starships
+                from starshipPilot in starship.Pilots
+                let pilotDetails = _pilotRepo.GetNameByPilotUrl(starshipPilot.Url)
+                where pilotDetails == null
+                select starshipPilot.Url;
+
+            return nonCachedPilot.ToList();
+        }
+
+        #endregion
     }
 }

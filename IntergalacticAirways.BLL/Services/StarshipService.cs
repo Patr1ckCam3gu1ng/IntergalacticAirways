@@ -25,8 +25,10 @@ namespace IntergalacticAirways.BLL.Services
         public List<Starship> FilterByCapacity(IEnumerable<Starship> starships, int numberOfPassengers)
         {
             return starships.Where(starship => starship.PassengerCapacity != null)
-                .Where(starship => numberOfPassengers >= starship.PassengerCapacity &&
-                                   numberOfPassengers <= starship.PassengerCapacity)
+                .Where(starship =>
+                    starship.PassengerCapacity >= numberOfPassengers &&
+                    numberOfPassengers <= starship.PassengerCapacity
+                )
                 .ToList();
         }
     }
