@@ -20,7 +20,7 @@ namespace IntergalacticAirways.BLL.Services
             _appSettings = appSettings.Value;
         }
 
-        public List<Starship> AssignStarshipPilot(List<Starship> starships)
+        public List<Starship> AssignStarshipPilot(IEnumerable<Starship> starships)
         {
             SetPilotDetailsCache(starships);
 

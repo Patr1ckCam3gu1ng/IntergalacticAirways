@@ -22,14 +22,13 @@ namespace IntergalacticAirways.BLL.Services
             return starships;
         }
 
-        public List<Starship> FilterByCapacity(IEnumerable<Starship> starships, int numberOfPassengers)
+        public IEnumerable<Starship> FilterByCapacity(IEnumerable<Starship> starships, int numberOfPassengers)
         {
             return starships.Where(starship => starship.PassengerCapacity != null)
                 .Where(starship =>
                     starship.PassengerCapacity >= numberOfPassengers &&
                     numberOfPassengers <= starship.PassengerCapacity
-                )
-                .ToList();
+                );
         }
     }
 }

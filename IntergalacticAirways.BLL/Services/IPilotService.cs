@@ -5,6 +5,6 @@ namespace IntergalacticAirways.BLL.Services
 {
     public interface IPilotService
     {
-        List<Starship> AssignStarshipPilot(List<Starship> starships);
+        List<Starship> AssignStarshipPilot(IEnumerable<Starship> starships);
     }
 }

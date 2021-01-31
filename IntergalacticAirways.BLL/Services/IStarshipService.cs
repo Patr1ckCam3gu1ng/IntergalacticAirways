@@ -8,6 +8,6 @@ namespace IntergalacticAirways.BLL.Services
     {
         Task<List<Starship>> GetByPageIndexAsync(int pageIndex);
 
-        List<Starship> FilterByCapacity(IEnumerable<Starship> starships, int numberOfPassengers);
+        IEnumerable<Starship> FilterByCapacity(IEnumerable<Starship> starships, int numberOfPassengers);
     }
 }
