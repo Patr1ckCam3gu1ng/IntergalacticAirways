@@ -15,8 +15,6 @@ namespace IntergalacticAirways
         {
             var serviceProvider = HostBuilder.GetServiceProvider(args);
 
-            var starshipService = serviceProvider.GetRequiredService<IStarshipService>();
-            var pilotService = serviceProvider.GetRequiredService<IPilotService>();
             var appSettings = serviceProvider.GetRequiredService<IOptions<AppSettings>>();
 
             while (true)
@@ -40,17 +38,14 @@ namespace IntergalacticAirways
 
                     while (pageIndex < appSettings.Value.MaximumPagination)
                     {
-                        var index = pageIndex;
-
-                        var starships = await GetStarStarships(starshipService, index,
-                            passengerCount, pilotService);
+                        var starships = await GetStarStarships(serviceProvider, pageIndex, passengerCount);
 
                         foreach (var starship in starships)
                         {
                             foreach (var pilot in starship.Pilots)
                             {
                                 hasAnyCapableStarship = true;
-
+                            
                                 Console.WriteLine($"{starship.Name} -- {pilot.Name}");
                             }
                         }
@@ -99,16 +94,18 @@ namespace IntergalacticAirways
             return numberPassengers < 1;
         }
 
-        private static async Task<List<Starship>> GetStarStarships(IStarshipService starshipService, int pageIndex,
-            string numberOfPassengers,
-            IPilotService pilotService)
+        private static async Task<List<StarshipDto>> GetStarStarships(IServiceProvider serviceProvider, int pageIndex,
+            string numberOfPassengers)
         {
-            var starshipByPageIndex = await starshipService.GetByPageIndexAsync(pageIndex);
+            var starshipService = serviceProvider.GetRequiredService<IStarshipService>();
+            var pilotService = serviceProvider.GetRequiredService<IPilotService>();
+
+            var starshipByPageIndex = await starshipService.GetByIndexPage(pageIndex);
 
             var starshipsByCapacity =
-                starshipService.FilterByCapacity(starshipByPageIndex, Convert.ToInt32(numberOfPassengers));
+                starshipService.FilterByPassengerCapacity(starshipByPageIndex, Convert.ToInt32(numberOfPassengers));
 
-            var starshipWithPilotName = pilotService.AssignStarshipPilot(starshipsByCapacity);
+            var starshipWithPilotName = await pilotService.GetStarshipPilot(starshipsByCapacity);
 
             return starshipWithPilotName;
         }

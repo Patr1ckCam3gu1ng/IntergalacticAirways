@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using IntergalacticAirways.Api.Apis;
 using IntergalacticAirways.DAL.Models;
 using IntergalacticAirways.DAL.Repositories;
+using IntergalacticAirways.Lib.Caches;
 using Microsoft.Extensions.Options;
 
 namespace IntergalacticAirways.BLL.Services
@@ -12,83 +14,129 @@ namespace IntergalacticAirways.BLL.Services
     public class PilotService : IPilotService
     {
         private readonly AppSettings _appSettings;
+        private readonly IMemoryCache _cacheService;
+        private readonly IPilotApi _pilotApi;
         private readonly IPilotRepo _pilotRepo;
+        private readonly IStarshipPilotService _starshipPilotService;
 
-        public PilotService(IPilotRepo pilotRepo, IOptions<AppSettings> appSettings)
+        public PilotService(IPilotRepo pilotRepo, IOptions<AppSettings> appSettings, IMemoryCache cacheService,
+            IPilotApi pilotApi, IStarshipPilotService starshipPilotService)
         {
             _pilotRepo = pilotRepo;
+            _cacheService = cacheService;
+            _pilotApi = pilotApi;
+            _starshipPilotService = starshipPilotService;
             _appSettings = appSettings.Value;
         }
 
-        public List<Starship> AssignStarshipPilot(IEnumerable<Starship> starships)
+        public async Task<List<StarshipDto>> GetStarshipPilot(List<Starship> starships)
         {
-            SetPilotDetailsCache(starships);
+            var pilots = await GetFromPilotApi(starships);
 
-            return GetPilotDetailsFromCache(starships);
+            if (pilots != null)
+            {
+                await _pilotRepo.Insert(pilots);
+
+                foreach (var pilot in pilots)
+                {
+                    var cacheKey = $"{Resource.Pilots}_{pilot.Url}";
+
+                    await _cacheService.CacheResponseAsync(cacheKey, pilot);
+                }
+            }
+
+            return await GetPilots(starships);
         }
 
         #region Private Functions
 
-        private List<Starship> GetPilotDetailsFromCache(IEnumerable<Starship> starships)
+        private async Task<List<StarshipDto>> GetPilots(IEnumerable<Starship> starships)
         {
-            var starshipList = new List<Starship>();
+            var starshipList = new List<StarshipDto>();
 
             foreach (var starship in starships)
             {
-                var pilotDetails = new List<PilotDetail>();
+                var starshipDto = new StarshipDto();
 
-                foreach (var pilot in starship.Pilots)
+                var starshipPilots = await _starshipPilotService.GetByStarshipId(starship.Id);
+
+                var pilots = new List<PilotDto>();
+
+                foreach (var starshipPilot in starshipPilots)
                 {
-                    var detail = _pilotRepo.GetNameByPilotUrl(pilot.Url);
+                    var pilot = await _pilotRepo.GetByUrl(starshipPilot.PilotUrl);
 
-                    pilot.Name = detail.Name;
+                    if (pilot == null)
+                    {
+                        continue;
+                    }
 
-                    pilotDetails.Add(pilot);
+                    pilots.Add(new PilotDto
+                    {
+                        Name = pilot.Name
+                    });
                 }
 
-                starship.Pilots = pilotDetails;
+                starshipDto.Name = starship.Name;
+                starshipDto.Pilots = pilots;
 
-                starshipList.Add(starship);
+                starshipList.Add(starshipDto);
             }
 
             return starshipList;
         }
 
-        private void SetPilotDetailsCache(IEnumerable<Starship> starships)
+        private async Task<List<PilotModel>> GetFromPilotApi(IEnumerable<Starship> starships)
         {
-            var nonCachedPilots = GetNonCachedPilotByUrl(starships);
+            var nonCachedPilots = await GetPilotsNotCached(starships);
 
-            if (!nonCachedPilots.Any())
+            if (nonCachedPilots.Any() == false)
             {
-                return;
+                return null;
             }
 
             var taskList = new List<Task>();
 
+            var pilots = new List<PilotModel>();
+
             taskList.AddRange(
-                nonCachedPilots.Select(pilotUrl =>
-                    Task.Run(async () => { await _pilotRepo.SetPilotDetailByUrl(pilotUrl); },
+                nonCachedPilots.Select(pilot =>
+                    Task.Run(async () =>
+                        {
+                            var pilotApiResponse = await _pilotApi.GetByUrl(pilot.PilotUrl);
+
+                            pilots.Add(pilotApiResponse);
+                        },
                         new CancellationTokenSource(
                             TimeSpan.FromSeconds(_appSettings.RequestMaximumWaitSeconds)).Token)));
 
-            if (!taskList.Any())
-            {
-                return;
-            }
 
             Task.WaitAll(taskList.ToArray(),
                 new CancellationTokenSource(TimeSpan.FromSeconds(_appSettings.RequestMaximumWaitSeconds)).Token);
+
+            return pilots;
         }
 
-        private List<string> GetNonCachedPilotByUrl(IEnumerable<Starship> starships)
+        private async Task<List<StarshipPilot>> GetPilotsNotCached(IEnumerable<Starship> starships)
         {
-            var nonCachedPilot = from starship in starships
-                from starshipPilot in starship.Pilots
-                let pilotDetails = _pilotRepo.GetNameByPilotUrl(starshipPilot.Url)
-                where pilotDetails == null
-                select starshipPilot.Url;
+            var nonCachedPilots = new List<StarshipPilot>();
 
-            return nonCachedPilot.ToList();
+            foreach (var starship in starships)
+            {
+                var starshipPilots = await _starshipPilotService.GetByStarshipId(starship.Id);
+
+                foreach (var pilot in starshipPilots)
+                {
+                    var cacheKey = $"{Resource.Pilots}_{pilot.PilotUrl}";
+
+                    if (_cacheService.GetCachedByKey(cacheKey) == null)
+                    {
+                        nonCachedPilots.Add(pilot);
+                    }
+                }
+            }
+
+            return nonCachedPilots;
         }
 
         #endregion

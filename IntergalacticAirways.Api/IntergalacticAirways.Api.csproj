@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\IntergalacticAirways.Api\IntergalacticAirways.Api.csproj" />
     <ProjectReference Include="..\IntergalacticAirways.DAL\IntergalacticAirways.DAL.csproj" />
   </ItemGroup>
 

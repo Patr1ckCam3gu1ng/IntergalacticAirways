@@ -1,12 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using IntergalacticAirways.DAL.Models;
 
 namespace IntergalacticAirways.DAL.Repositories
 {
     public interface IPilotRepo
     {
-        Task<PilotDetail> SetPilotDetailByUrl(string pilotUrl);
+        Task Insert(List<PilotModel> pilots);
 
-        PilotDetail GetNameByPilotUrl(string pilot);
+        Task<Pilot> GetByUrl(string pilotUrl);
     }
 }

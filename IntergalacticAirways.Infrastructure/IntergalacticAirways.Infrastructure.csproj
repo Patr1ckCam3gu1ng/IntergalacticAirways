@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
@@ -14,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\IntergalacticAirways.Api\IntergalacticAirways.Api.csproj" />
     <ProjectReference Include="..\IntergalacticAirways.BLL\IntergalacticAirways.BLL.csproj" />
     <ProjectReference Include="..\IntergalacticAirways.DAL\IntergalacticAirways.DAL.csproj" />
     <ProjectReference Include="..\IntergalacticAirways.Lib\IntergalacticAirways.Lib.csproj" />

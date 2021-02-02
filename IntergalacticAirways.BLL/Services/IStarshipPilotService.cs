@@ -4,8 +4,8 @@ using IntergalacticAirways.DAL.Models;
 
 namespace IntergalacticAirways.BLL.Services
 {
-    public interface IPilotService
+    public interface IStarshipPilotService
     {
-        Task<List<StarshipDto>> GetStarshipPilot(List<Starship> starships);
+        Task<List<StarshipPilot>> GetByStarshipId(int starshipId);
     }
 }

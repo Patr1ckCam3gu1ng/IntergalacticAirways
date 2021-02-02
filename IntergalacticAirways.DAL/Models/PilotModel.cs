@@ -1,6 +1,6 @@
 ﻿namespace IntergalacticAirways.DAL.Models
 {
-    public class PilotDetail
+    public class PilotModel
     {
         public string Name { get; set; }
 

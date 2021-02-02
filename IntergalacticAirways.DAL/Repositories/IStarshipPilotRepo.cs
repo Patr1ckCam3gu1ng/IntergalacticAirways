@@ -4,10 +4,8 @@ using IntergalacticAirways.DAL.Models;
 
 namespace IntergalacticAirways.DAL.Repositories
 {
-    public interface IStarshipsRepo
+    public interface IStarshipPilotRepo
     {
-        Task Insert(List<StarshipModel> starships, int pageIndex);
-
-        Task<List<Starship>> GetByPageIndex(int pageIndex);
+        Task<List<StarshipPilot>> GetByStarshipId(int starshipId);
     }
 }

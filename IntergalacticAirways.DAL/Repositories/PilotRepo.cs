@@ -1,56 +1,37 @@
-﻿using System;
-using System.Threading;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using IntergalacticAirways.DAL.Entities;
 using IntergalacticAirways.DAL.Models;
-using IntergalacticAirways.Lib.Caches;
-using IntergalacticAirways.Lib.HttpClients;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace IntergalacticAirways.DAL.Repositories
 {
     public class PilotRepo : IPilotRepo
     {
-        private readonly AppSettings _appSettings;
-        private readonly IMemoryCache _cacheService;
-        private readonly IApiHttpClient _httpClient;
+        private readonly IntergalacticAirwaysDbContext _dbContext;
+        private readonly IMapper _mapper;
 
-        public PilotRepo(IOptions<AppSettings> appSettings, IMemoryCache cacheService, IApiHttpClient httpClient)
+        public PilotRepo(IntergalacticAirwaysDbContext dbContext, IMapper mapper)
         {
-            _cacheService = cacheService;
-            _httpClient = httpClient;
-            _appSettings = appSettings.Value;
+            _dbContext = dbContext;
+            _mapper = mapper;
         }
 
-        public async Task<PilotDetail> SetPilotDetailByUrl(string pilotUrl)
+        public async Task Insert(List<PilotModel> pilots)
         {
-            var maxWaitToken =
-                new CancellationTokenSource(TimeSpan.FromSeconds(_appSettings.RequestMaximumWaitSeconds));
-
-            var jsonResponse = await _httpClient.SendGetRequest(pilotUrl, maxWaitToken.Token);
-
-            if (jsonResponse == null)
+            foreach (var mappedPilot in pilots.Select(pilot => _mapper.Map<Pilot>(pilot)))
             {
-                return null;
+                await _dbContext.Pilot.AddAsync(mappedPilot);
             }
 
-            var pilotDetail = JsonConvert.DeserializeObject<PilotDetail>(jsonResponse);
-
-            await _cacheService.CacheResponseAsync(pilotUrl, pilotDetail);
-
-            return pilotDetail;
+            await _dbContext.SaveChangesAsync();
         }
 
-        public PilotDetail GetNameByPilotUrl(string pilot)
+        public async Task<Pilot> GetByUrl(string pilotUrl)
         {
-            if (_cacheService.GetCachedByKey(pilot) == null)
-            {
-                return null;
-            }
-
-            var starShipCaches = _cacheService.GetCachedByKey(pilot) as PilotDetail;
-
-            return starShipCaches;
+            return await _dbContext.Pilot.FirstOrDefaultAsync(c => c.Url == pilotUrl);
         }
     }
 }

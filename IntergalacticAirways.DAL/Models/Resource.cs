@@ -2,6 +2,8 @@
 {
     public enum Resource
     {
-        Starships
+        Starships,
+        StarshipPilots,
+        Pilots
     }
 }

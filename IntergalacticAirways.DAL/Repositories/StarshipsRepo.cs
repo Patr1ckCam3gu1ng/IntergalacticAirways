@@ -1,80 +1,50 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using IntergalacticAirways.DAL.Entities;
 using IntergalacticAirways.DAL.Models;
-using IntergalacticAirways.Lib.Caches;
-using IntergalacticAirways.Lib.HttpClients;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace IntergalacticAirways.DAL.Repositories
 {
     public class StarshipsRepo : IStarshipsRepo
     {
-        private readonly AppSettings _appSettings;
-        private readonly IMemoryCache _cacheService;
-        private readonly IApiHttpClient _httpClient;
+        private readonly IntergalacticAirwaysDbContext _dbContext;
         private readonly IMapper _mapper;
 
-        public StarshipsRepo(IMemoryCache cacheService, IApiHttpClient httpClient, IOptions<AppSettings> appSettings,
-            IMapper mapper)
+        public StarshipsRepo(IntergalacticAirwaysDbContext dbContext, IMapper mapper)
         {
-            _cacheService = cacheService;
-            _httpClient = httpClient;
+            _dbContext = dbContext;
             _mapper = mapper;
-            _appSettings = appSettings.Value;
         }
 
-        public async Task<List<Starship>> GetByPageIndexAsync(int pageIndex)
+        public async Task Insert(List<StarshipModel> starships, int pageIndex)
         {
-            var cacheKey = $"{Resource.Starships}/?page={pageIndex}".ToLowerInvariant();
-
-            if (_cacheService.GetCachedByKey(cacheKey) != null)
+            foreach (var starship in starships)
             {
-                var starShipCaches = _cacheService.GetCachedByKey(cacheKey) as List<Starship>;
+                var mappedStarship = _mapper.Map<Starship>(starship);
 
-                return starShipCaches;
+                mappedStarship.PageIndex = pageIndex;
+
+                await _dbContext.Starship.AddAsync(mappedStarship);
+
+                foreach (var starshipPilot in starship.Pilots)
+                {
+                    await _dbContext.StarshipPilot.AddAsync(new StarshipPilot
+                    {
+                        StarshipId = mappedStarship.Id,
+                        PilotUrl = starshipPilot.Url
+                    });
+                }
             }
 
-            var starships = new List<Starship>();
-
-            var starShips = await RequestData(cacheKey);
-
-            if (starShips == null)
-            {
-                return starships;
-            }
-
-            if (starShips.Any())
-            {
-                starships.AddRange(starShips);
-            }
-
-            return starships;
+            await _dbContext.SaveChangesAsync();
         }
 
-        private async Task<List<Starship>> RequestData(string cacheKey)
+        public async Task<List<Starship>> GetByPageIndex(int pageIndex)
         {
-            var maxWaitToken =
-                new CancellationTokenSource(TimeSpan.FromSeconds(_appSettings.RequestMaximumWaitSeconds));
-
-            var jsonResponse = await _httpClient.SendGetRequest($"{_appSettings.BaseUrl}{cacheKey}", maxWaitToken.Token);
-
-            if (jsonResponse == null)
-            {
-                return null;
-            }
-
-            var starShips = JsonConvert.DeserializeObject<StarshipResponse>(jsonResponse);
-
-            var mappedResults = _mapper.Map<List<Starship>>(starShips.Results);
-
-            await _cacheService.CacheResponseAsync(cacheKey, mappedResults);
-
-            return mappedResults;
+            return await _dbContext.Starship.Where(c => c.PageIndex == pageIndex).ToListAsync();
         }
     }
 }

@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntergalacticAirways.Infras
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntergalacticAirways.DAL", "..\IntergalacticAirways.DAL\IntergalacticAirways.DAL.csproj", "{D45B8429-FFD4-4F87-B218-06D17072BF29}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntergalacticAirways.Lib", "..\IntergalacticAirways.Lib\IntergalacticAirways.Lib.csproj", "{338B5056-BD49-488E-B152-DAEFCF24B1D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntergalacticAirways.Lib", "..\IntergalacticAirways.Lib\IntergalacticAirways.Lib.csproj", "{338B5056-BD49-488E-B152-DAEFCF24B1D1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntergalacticAirways.Api", "..\IntergalacticAirways.Api\IntergalacticAirways.Api.csproj", "{317DC31D-C8EB-4D92-A3A9-B6DB59EE71D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{338B5056-BD49-488E-B152-DAEFCF24B1D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{338B5056-BD49-488E-B152-DAEFCF24B1D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{338B5056-BD49-488E-B152-DAEFCF24B1D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{317DC31D-C8EB-4D92-A3A9-B6DB59EE71D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{317DC31D-C8EB-4D92-A3A9-B6DB59EE71D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{317DC31D-C8EB-4D92-A3A9-B6DB59EE71D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{317DC31D-C8EB-4D92-A3A9-B6DB59EE71D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
