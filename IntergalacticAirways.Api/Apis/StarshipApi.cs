@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using IntergalacticAirways.Api.Apis;
 using IntergalacticAirways.DAL.Models;
 using IntergalacticAirways.Lib.HttpClients;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
-namespace IntergalacticAirways.Api
+namespace IntergalacticAirways.Api.Apis
 {
     public class StarshipApi : IStarshipApi
     {
