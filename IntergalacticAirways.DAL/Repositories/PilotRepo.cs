@@ -19,14 +19,20 @@ namespace IntergalacticAirways.DAL.Repositories
             _mapper = mapper;
         }
 
-        public async Task Insert(List<PilotModel> pilots)
+        public async Task<List<Pilot>> Insert(List<PilotModel> pilotModels)
         {
-            foreach (var mappedPilot in pilots.Select(pilot => _mapper.Map<Pilot>(pilot)))
+            var pilots = new List<Pilot>();
+
+            foreach (var pilot in pilotModels.Select(pilot => _mapper.Map<Pilot>(pilot)))
             {
-                await _dbContext.Pilot.AddAsync(mappedPilot);
+                pilots.Add(pilot);
+
+                await _dbContext.Pilot.AddAsync(pilot);
             }
 
             await _dbContext.SaveChangesAsync();
+
+            return pilots;
         }
 
         public async Task<Pilot> GetByUrl(string pilotUrl)

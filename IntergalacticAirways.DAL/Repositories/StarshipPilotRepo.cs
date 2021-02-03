@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using IntergalacticAirways.DAL.Entities;
-using IntergalacticAirways.DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace IntergalacticAirways.DAL.Repositories

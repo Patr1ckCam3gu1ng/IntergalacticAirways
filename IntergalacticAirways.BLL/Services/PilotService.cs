@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
 using IntergalacticAirways.Api.Apis;
 using IntergalacticAirways.DAL.Entities;
 using IntergalacticAirways.DAL.Models;
@@ -19,39 +20,39 @@ namespace IntergalacticAirways.BLL.Services
         private readonly IPilotApi _pilotApi;
         private readonly IPilotRepo _pilotRepo;
         private readonly IStarshipPilotService _starshipPilotService;
+        private readonly IMapper _mapper;
 
         public PilotService(IPilotRepo pilotRepo, IOptions<AppSettings> appSettings, IMemoryCache cacheService,
-            IPilotApi pilotApi, IStarshipPilotService starshipPilotService)
+            IPilotApi pilotApi, IStarshipPilotService starshipPilotService, IMapper mapper)
         {
             _pilotRepo = pilotRepo;
             _cacheService = cacheService;
             _pilotApi = pilotApi;
             _starshipPilotService = starshipPilotService;
+            _mapper = mapper;
             _appSettings = appSettings.Value;
         }
 
         public async Task<List<StarshipDto>> GetStarshipPilot(List<Starship> starships)
         {
-            var pilots = await GetFromPilotApi(starships);
+            var pilotApi = await GetFromPilotApi(starships);
 
-            if (pilots != null)
+            if (pilotApi != null)
             {
-                await _pilotRepo.Insert(pilots);
+                var pilots = await _pilotRepo.Insert(pilotApi);
 
                 foreach (var pilot in pilots)
                 {
-                    var cacheKey = $"{Resource.Pilots}_{pilot.Url}";
-
-                    await _cacheService.CacheResponseAsync(cacheKey, pilot);
+                    await _cacheService.CacheResponseAsync($"{Resource.Pilots}_{pilot.Url}", pilot);
                 }
             }
 
-            return await GetPilots(starships);
+            return await GetFromPilots(starships);
         }
 
         #region Private Functions
 
-        private async Task<List<StarshipDto>> GetPilots(IEnumerable<Starship> starships)
+        private async Task<List<StarshipDto>> GetFromPilots(IEnumerable<Starship> starships)
         {
             var starshipList = new List<StarshipDto>();
 
@@ -65,17 +66,17 @@ namespace IntergalacticAirways.BLL.Services
 
                 foreach (var starshipPilot in starshipPilots)
                 {
-                    var pilot = await _pilotRepo.GetByUrl(starshipPilot.PilotUrl);
+                    var cacheKey = $"{Resource.Pilots}_{starshipPilot.PilotUrl}";
 
-                    if (pilot == null)
+                    var pilotCache = _cacheService.GetCachedByKey(cacheKey);
+
+                    if (pilotCache is Pilot pilot)
                     {
-                        continue;
+                        pilots.Add(new PilotDto
+                        {
+                            Name = pilot.Name
+                        });
                     }
-
-                    pilots.Add(new PilotDto
-                    {
-                        Name = pilot.Name
-                    });
                 }
 
                 starshipDto.Name = starship.Name;

@@ -7,7 +7,7 @@ namespace IntergalacticAirways.DAL.Repositories
 {
     public interface IPilotRepo
     {
-        Task Insert(List<PilotModel> pilots);
+        Task<List<Pilot>> Insert(List<PilotModel> pilotModels);
 
         Task<Pilot> GetByUrl(string pilotUrl);
     }
