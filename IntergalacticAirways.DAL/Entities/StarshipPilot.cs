@@ -1,4 +1,4 @@
-﻿namespace IntergalacticAirways.DAL.Models
+﻿namespace IntergalacticAirways.DAL.Entities
 {
     public class StarshipPilot
     {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace IntergalacticAirways.DAL.Models
+namespace IntergalacticAirways.DAL.Entities
 {
     public class Starship
     {

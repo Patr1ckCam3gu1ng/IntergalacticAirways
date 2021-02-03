@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using IntergalacticAirways.DAL.Entities;
 using IntergalacticAirways.DAL.Models;
 using IntergalacticAirways.DAL.Repositories;
 using IntergalacticAirways.Lib.Caches;

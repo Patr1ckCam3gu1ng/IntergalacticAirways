@@ -9,11 +9,11 @@ namespace IntergalacticAirways.DAL.Entities
             : base(options)
         {
         }
+
         public DbSet<StarshipPilot> StarshipPilot { get; set; }
 
         public DbSet<Starship> Starship { get; set; }
 
         public DbSet<Pilot> Pilot { get; set; }
-
     }
 }

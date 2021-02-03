@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -14,9 +13,9 @@ namespace IntergalacticAirways.Api
 {
     public class StarshipApi : IStarshipApi
     {
+        private readonly AppSettings _appSettings;
         private readonly IApiHttpClient _httpClient;
         private readonly IMapper _mapper;
-        private readonly AppSettings _appSettings;
 
         public StarshipApi(IOptions<AppSettings> appSettings, IApiHttpClient httpClient, IMapper mapper)
         {
@@ -26,13 +25,6 @@ namespace IntergalacticAirways.Api
         }
 
         public async Task<List<StarshipModel>> GetByPageIndexAsync(int pageIndex)
-        {
-            var starShips = await RequestData(pageIndex);
-
-            return starShips;
-        }
-
-        private async Task<List<StarshipModel>> RequestData(int pageIndex)
         {
             var maxWaitToken =
                 new CancellationTokenSource(TimeSpan.FromSeconds(_appSettings.RequestMaximumWaitSeconds));

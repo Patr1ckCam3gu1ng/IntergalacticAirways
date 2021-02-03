@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using AutoMapper;
+using IntergalacticAirways.DAL.Entities;
 using IntergalacticAirways.DAL.Models;
 using Microsoft.Extensions.DependencyInjection;
 

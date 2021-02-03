@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using IntergalacticAirways.Api.Apis;
+using IntergalacticAirways.DAL.Entities;
 using IntergalacticAirways.DAL.Models;
 using IntergalacticAirways.DAL.Repositories;
 using IntergalacticAirways.Lib.Caches;
