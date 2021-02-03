@@ -95,7 +95,7 @@ namespace IntergalacticAirways
         }
 
         private static async Task<List<StarshipDto>> GetStarStarships(IServiceProvider serviceProvider, int pageIndex,
-            string numberOfPassengers)
+            string passengerCount)
         {
             var starshipService = serviceProvider.GetRequiredService<IStarshipService>();
             var pilotService = serviceProvider.GetRequiredService<IPilotService>();
@@ -103,7 +103,7 @@ namespace IntergalacticAirways
             var starshipByPageIndex = await starshipService.GetByIndexPage(pageIndex);
 
             var starshipsByCapacity =
-                starshipService.FilterByPassengerCapacity(starshipByPageIndex, Convert.ToInt32(numberOfPassengers));
+                starshipService.FilterByPassengerCapacity(starshipByPageIndex, Convert.ToInt32(passengerCount));
 
             var starshipWithPilotName = await pilotService.GetStarshipPilot(starshipsByCapacity);
 
